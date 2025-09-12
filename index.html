@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线课表生成器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>在线课表生成器</h1>
+        <p>请将从教务系统获取的JSON数据完整粘贴到下方文本框中，然后点击“生成课表”按钮</p>
+        <p class="privacy-note">✨ 本页面加载成功后可断网使用，所有数据处理均在您的浏览器本地完成，不会上传服务器</p>
+        <p class="privacy-note"><a href="https://github.com/ccmu-schedule/schedule/blob/main/README.md" target="_blank" rel="noopener noreferrer">获取课表json代码教程</a></p>
+        
+        <textarea id="jsonInput" placeholder="在此处粘贴您的JSON代码..."></textarea>
+        
+        <button id="generateBtn">生成课表 (.xlsx)</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
