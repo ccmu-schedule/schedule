@@ -1,0 +1,121 @@
+/* Google Font for better typography - optional but recommended */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+
+body {
+    /* Using a more modern font stack with fallback to Chinese font */
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    
+    /* --- 改变垂直对齐方式 --- */
+    /* 从 center 改为 flex-start，让内容从顶部开始排列 */
+    align-items: flex-start; 
+    
+    min-height: 100vh;
+    margin: 0;
+    
+    /* --- 使用 padding 替代 align-items 来控制边距 --- */
+    /* 给予一定的上下和左右边距，让容器不会紧贴屏幕边缘 */
+    padding: 5vh 20px; 
+    
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #ffffff;
+    /* 微调垂直 padding */
+    padding: 25px 40px; 
+    border-radius: 12px;
+    box-shadow: 0 8px
+ 20px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+p {
+    color: #555;
+    line-height: 1.6;
+    margin-top: 0;
+    /* 微调段落下边距 */
+    margin-bottom: 15px; 
+}
+
+.privacy-note {
+    font-size: 0.9em;
+    color: #888;
+}
+
+/* 调整教程链接和输入框的距离 */
+.container p:last-of-type {
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    
+    /* --- 使用动态高度替代固定高度 --- */
+    /* 高度为视口高度的30%，并设置了合理的最小和最大值 */
+    height: 30vh;
+    min-height: 150px;
+    max-height: 300px;
+    
+    padding: 15px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    /* 微调输入框和按钮的距离 */
+    margin-bottom: 20px; 
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+}
+
+button {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button:hover {
+    background-color: #357abd;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#status {
+    margin-top: 20px;
+    font-size: 1em;
+    min-height: 24px;
+}
+
+#status.success {
+    color: #27ae60;
+}
+
+#status.error {
+    color: #c0392b;
+    font-weight: bold;
+}
