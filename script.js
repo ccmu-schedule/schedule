@@ -44,31 +44,46 @@ async function generateExcel(jsonData) {
         throw new Error("JSON结构不符合预期，缺少顶层 'data' 数组");
     }
     
-    for (const sectionData of jsonData.data) {
+    jsonData.data.forEach((sectionData, sectionIndex) => {
+        const currentPeriodIndex = sectionIndex;
+
         for (const dayName of daysOfWeek) {
             if (sectionData[dayName] && Array.isArray(sectionData[dayName])) {
                 for (const course of sectionData[dayName]) {
-                    if (!course.weeks || !course.nodes || !course.className || !course.classroomName) continue;
-                    const courseInfo = `${course.className}\n${course.classroomName}`;
+                    if (!course.weeks || !course.className || !course.classroomName || !course.teacherName) continue;
+
                     const weekNums = String(course.weeks).split(',').map(Number);
-                    const periodNums = String(course.nodes).split(',').map(Number);
                     if (weekNums.length > 0) {
                         const currentMax = Math.max(...weekNums);
                         if (currentMax > maxWeek) maxWeek = currentMax;
                     }
+
                     for (const week of weekNums) {
                         if (!schedule[week]) schedule[week] = {};
-                        for (const period of periodNums) {
-                            if (period >= 1 && period <= 12) {
-                                if (!schedule[week][dayName]) schedule[week][dayName] = Array(12).fill("");
-                                schedule[week][dayName][period - 1] = courseInfo;
+                        if (!schedule[week][dayName]) schedule[week][dayName] = Array(12).fill(null); // Use null for empty slots
+
+                        // *** 创建或更新结构化对象 ***
+                        const cellData = schedule[week][dayName][currentPeriodIndex];
+
+                        if (!cellData) {
+                            // 如果单元格为空，创建新的对象
+                            schedule[week][dayName][currentPeriodIndex] = {
+                                className: course.className,
+                                classroomName: course.classroomName,
+                                teachers: [course.teacherName] // 上课教师数组
+                            };
+                        } else {
+                            // 如果单元格已有对象，只更新教师列表
+                            // 检查教师是否已存在，防止重复添加
+                            if (!cellData.teachers.includes(course.teacherName)) {
+                                cellData.teachers.push(course.teacherName);
                             }
                         }
                     }
                 }
             }
         }
-    }
+    });
     
     // 2. 创建和设置Excel工作簿
     const wb = new ExcelJS.Workbook();
@@ -87,7 +102,15 @@ async function generateExcel(jsonData) {
             const rowData = [rowHeader];
             for (const dayName of daysOfWeek) {
                 const daySchedule = (schedule[weekNum] && schedule[weekNum][dayName]) ? schedule[weekNum][dayName] : [];
-                rowData.push(daySchedule[i] || "");
+                const cellData = daySchedule[i]; 
+
+                // *** 格式化对象为最终字符串 ***
+                if (cellData) {
+                    const formattedString = `${cellData.className}\n${cellData.classroomName}\n${cellData.teachers.join('、')}`;
+                    rowData.push(formattedString);
+                } else {
+                    rowData.push(""); 
+                }
             }
             ws.addRow(rowData);
         }
