@@ -12,5 +12,6 @@
 <img width="771" height="615" alt="image" src="https://github.com/user-attachments/assets/04ba0371-4a1d-419c-913a-652f8cb9521b" />
 
 ## 第五步：复制下方json代码到在线课表生成器网页中，点击“生成课表”
-<img width="1466" height="930" alt="image" src="https://github.com/user-attachments/assets/766ecb14-3a64-46cc-9413-a2783e437c6f" />
+<img width="1531" height="948" alt="image" src="https://github.com/user-attachments/assets/59bb4b20-82d9-49dc-95f6-57e80442073c" />
+
 
