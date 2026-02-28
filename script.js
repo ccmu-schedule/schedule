@@ -50,7 +50,7 @@ async function generateExcel(jsonData) {
         for (const dayName of daysOfWeek) {
             if (sectionData[dayName] && Array.isArray(sectionData[dayName])) {
                 for (const course of sectionData[dayName]) {
-                    if (!course.weeks || !course.className || !course.classroomName || !course.teacherName) continue;
+                    if (!course.weeks || !course.className || !course.teacherName) continue;
 
                     const weekNums = String(course.weeks).split(',').map(Number);
                     if (weekNums.length > 0) {
@@ -69,7 +69,7 @@ async function generateExcel(jsonData) {
                             // 如果单元格为空，创建新的对象
                             schedule[week][dayName][currentPeriodIndex] = {
                                 className: course.className,
-                                classroomName: course.classroomName,
+                                classroomName: course.classroomName || '未指定教室',
                                 teachers: [course.teacherName] // 上课教师数组
                             };
                         } else {
