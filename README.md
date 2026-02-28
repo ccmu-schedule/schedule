@@ -1,4 +1,4 @@
-# 首都医科大学excel课表生成工具 👋
+# 首都医科大学excel课表生成工具V2.0 👋
 
 ## 第一步：登陆教务系统的课表查看页面
 <img width="1732" height="754" alt="image" src="https://github.com/user-attachments/assets/4c7b4787-f09a-4b8c-8c50-3de60d00cd42" />
