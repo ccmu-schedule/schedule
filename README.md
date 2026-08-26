@@ -3,7 +3,7 @@
 ## 一键导出（v3.0新增）
 
 ### 第一步（方式1）：拖拽设置书签，将“导出已选学期课表”按钮拖拽到浏览器书签栏
-<img width="1554" height="930" alt="image" src="https://github.com/user-attachments/assets/a5a31659-5484-4338-8817-4a7602359376" />
+<img width="1446" height="720" alt="image" src="https://github.com/user-attachments/assets/13e1ea32-30ea-4376-bcaa-b0512d646901" />
 
 ### 第一步（方式2）：手动设置书签，点击“复制书签代码”按钮，并粘贴到对应网址栏中
 <img width="631" height="660" alt="image" src="https://github.com/user-attachments/assets/8e9d913f-a093-4a92-8342-e669fe7939db" />
