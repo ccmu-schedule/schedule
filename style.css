@@ -41,3 +41,41 @@ button:hover, .button-link:hover { background: #357abd; }
   .card { padding: 20px 18px; }
   .actions > * { width: 100%; }
 }
+
+/* bookmarklet 专用接收窗口：减少干扰，成功后脚本会自动关闭 */
+body.receiver-mode {
+    padding: 18px;
+    background: #f4f7f6;
+}
+
+body.receiver-mode .container {
+    max-width: 460px;
+}
+
+body.receiver-mode h1 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+}
+
+body.receiver-mode .one-click-card,
+body.receiver-mode .card:nth-of-type(2) > h2,
+body.receiver-mode .card:nth-of-type(2) > p,
+body.receiver-mode .card:nth-of-type(2) > textarea,
+body.receiver-mode .card:nth-of-type(2) > .actions,
+body.receiver-mode #diagnostics {
+    display: none !important;
+}
+
+body.receiver-mode .card:nth-of-type(2) {
+    padding: 18px;
+    margin: 0;
+}
+
+body.receiver-mode #status {
+    margin: 0;
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
