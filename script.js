@@ -23,8 +23,9 @@ const statusEl = document.getElementById("status");
 const diagnosticsEl = document.getElementById("diagnostics");
 const bookmarkletLink = document.getElementById("bookmarkletLink");
 const copyBookmarkletBtn = document.getElementById("copyBookmarkletBtn");
-const selectedBookmarkletLink = document.getElementById("selectedBookmarkletLink");
-const copySelectedBookmarkletBtn = document.getElementById("copySelectedBookmarkletBtn");
+const receiverMode = new URLSearchParams(window.location.search).get("receiver") === "1";
+
+if (receiverMode) document.body.classList.add("receiver-mode");
 
 generateBtn.addEventListener("click", () => processAndGenerate(jsonInput.value, "手动粘贴"));
 
@@ -49,7 +50,37 @@ window.addEventListener("message", async event => {
 
   const payload = event.data.payload;
   jsonInput.value = typeof payload === "string" ? payload : JSON.stringify(payload);
-  await processAndGenerate(payload, "教务系统一键导出");
+  const outcome = await processAndGenerate(payload, "教务系统一键导出");
+
+  try {
+    if (outcome?.ok) {
+      event.source?.postMessage({
+        type:"CCMU_SCHEDULE_COMPLETE",
+        fileName:outcome.fileName
+      }, event.origin);
+    } else {
+      event.source?.postMessage({
+        type:"CCMU_SCHEDULE_ERROR",
+        message:outcome?.error || "未知错误"
+      }, event.origin);
+    }
+  } catch (_) {}
+
+  if (receiverMode) {
+    setTimeout(() => {
+      try { window.close(); } catch (_) {}
+    }, outcome?.ok ? 1400 : 6000);
+  }
+});
+
+window.addEventListener("load", () => {
+  if (!receiverMode || !window.opener) return;
+  setStatus("接收窗口已就绪，正在等待教务系统返回课表数据…", "info");
+  try {
+    window.opener.postMessage({type:"CCMU_SCHEDULE_READY"}, "*");
+    window.blur();
+    window.opener.focus();
+  } catch (_) {}
 });
 
 setupBookmarklet();
@@ -111,10 +142,12 @@ async function processAndGenerate(input, source) {
 
     const fileName = await generateExcel(result);
     setStatus(`课表生成成功：${fileName}`, "success");
+    return {ok:true, fileName};
   } catch (e) {
     console.error(e);
     const message = e instanceof SyntaxError ? "JSON 格式错误，请确认复制的是完整 Response" : e.message;
     setStatus(`生成失败：${message}`, "error");
+    return {ok:false, error:message};
   }
 }
 
@@ -443,124 +476,102 @@ async function generateExcel(result) {
 }
 
 function setupBookmarklet() {
+  if (!bookmarkletLink || !copyBookmarkletBtn) return;
+
   const generator = new URL(".", window.location.href);
-  generator.search=""; generator.hash="";
+  generator.search = "";
+  generator.hash = "";
+  const code = buildBookmarklet(generator.href);
+  const fullCode = `javascript:${code}`;
 
-  const currentCode = buildBookmarklet(generator.href, "current");
-  const selectedCode = buildBookmarklet(generator.href, "selected");
-
-  bookmarkletLink.href = `javascript:${currentCode}`;
-  selectedBookmarkletLink.href = `javascript:${selectedCode}`;
+  bookmarkletLink.href = fullCode;
 
   copyBookmarkletBtn.addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(`javascript:${currentCode}`);
-      setStatus("“当前学期一键导出”书签代码已复制。新建书签并粘贴到网址/URL 栏即可。", "success");
+      await navigator.clipboard.writeText(fullCode);
+      setStatus("书签代码已复制。新建书签并把代码粘贴到“网址/URL”栏即可。", "success");
     } catch (_) {
-      setStatus("浏览器不允许自动复制；直接把“CCMU 当前学期一键导出”拖到书签栏即可。", "info");
-    }
-  });
-
-  copySelectedBookmarkletBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(`javascript:${selectedCode}`);
-      setStatus("“导出已选学期”书签代码已复制。新建书签并粘贴到网址/URL 栏即可。", "success");
-    } catch (_) {
-      setStatus("浏览器不允许自动复制；直接把“CCMU 导出已选学期”拖到书签栏即可。", "info");
+      setStatus("浏览器不允许自动复制；可直接把蓝色“CCMU 导出已选学期”链接拖到书签栏。", "info");
     }
   });
 }
 
-function buildBookmarklet(generatorUrl, mode = "current") {
+function buildBookmarklet(generatorUrl) {
   const G = JSON.stringify(generatorUrl);
-  const MODE = JSON.stringify(mode);
   const code = `(function(){
-var G=${G},MODE=${MODE},O=(new URL(G)).origin,W=window.open(G,"ccmuScheduleExporter"),D=false,T=null;
-if(!W){alert("请允许本页打开弹窗后重试。");return;}
+if(window.__CCMU_SCHEDULE_EXPORTING__){N("已有导出任务正在运行，请稍候。","warn",3500);return}
+window.__CCMU_SCHEDULE_EXPORTING__=true;
+var G=${G},O=(new URL(G)).origin,W=null,D=false,A=false,R=null,F0=window.fetch,X=XMLHttpRequest.prototype,OO=X.open,SS=X.send,TO=null;
+function N(m,t,d){
+ var id="__ccmu_schedule_notice__",n=document.getElementById(id);
+ if(!n){n=document.createElement("div");n.id=id;n.style.cssText="position:fixed;z-index:2147483647;right:20px;top:20px;max-width:420px;padding:13px 16px;border-radius:9px;background:#23364d;color:#fff;font:14px/1.55 -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.25);white-space:pre-wrap;transition:opacity .2s";document.documentElement.appendChild(n)}
+ n.textContent=m;n.style.background=t==="error"?"#b93636":t==="success"?"#218c55":t==="warn"?"#8a6418":"#23364d";n.style.opacity="1";
+ clearTimeout(n.__timer);if(d)n.__timer=setTimeout(function(){n.style.opacity="0";setTimeout(function(){try{n.remove()}catch(e){}},250)},d)
+}
+function C(){
+ try{if(F0)window.fetch=F0;X.open=OO;X.send=SS}catch(e){}
+ if(R)clearInterval(R);if(TO)clearTimeout(TO);window.__CCMU_SCHEDULE_EXPORTING__=false
+}
 function M(u){return String(u||"").indexOf("queryStudentSchedule")>=0}
+function S(){
+ var vals=[];
+ [].slice.call(document.querySelectorAll("input,[role=combobox],.el-select,.el-input")).forEach(function(e){
+  var v=(e.value||e.getAttribute&&e.getAttribute("value")||e.innerText||e.textContent||"").trim();
+  var m=v.match(/20\\d{2}-20\\d{2}-[12]/);if(m)vals.push(m[0])
+ });
+ return vals[0]||""
+}
 function P(x){
  if(D)return;
  try{
-  var o=typeof x==="string"?JSON.parse(x):x;
-  if(!o||typeof o!=="object")return;
-  D=true;var m={type:"CCMU_SCHEDULE_DATA",payload:o};
-  function s(){try{W.postMessage(m,O)}catch(e){}}
-  s();T=setInterval(s,500);setTimeout(function(){clearInterval(T)},10000);
- }catch(e){}
-}
-window.addEventListener("message",function(e){
- if(e.origin===O&&e.data&&e.data.type==="CCMU_SCHEDULE_ACK"&&T)clearInterval(T);
-});
-var F=window.fetch;
-if(F)window.fetch=async function(){
- var r=await F.apply(this,arguments);
- try{var a=arguments[0],u=typeof a==="string"?a:(a&&a.url);if(M(u))r.clone().text().then(P)}catch(e){}
- return r;
-};
-var X=XMLHttpRequest.prototype,OO=X.open,SS=X.send;
-X.open=function(m,u){this.__ccmuScheduleUrl=u;return OO.apply(this,arguments)};
-X.send=function(){
- if(M(this.__ccmuScheduleUrl))this.addEventListener("load",function(){
-  try{P(this.responseType==="json"?this.response:this.responseText)}catch(e){}
- },{once:true});
- return SS.apply(this,arguments);
-};
-function TX(e){return((e&&e.innerText)||(e&&e.textContent)||"").trim()}
-function GT(){
- var m=(document.body.innerText||"").match(/当前学期\\s*[:：]\\s*(\\d{4}-\\d{4}-[12])/);
- return m?m[1]:"";
-}
-function TI(){
- var a=[].slice.call(document.querySelectorAll("input"));
- return a.find(function(i){return /^\\d{4}-\\d{4}-[12]$/.test((i.value||"").trim())})||
-        a.find(function(i){var p=i.closest&&i.closest(".el-select");return p&&/学年学期/.test(TX(p.parentElement||p))});
-}
-function OP(i){
- var e=(i.closest&&i.closest(".el-select"))||i.parentElement||i;
- try{e.dispatchEvent(new MouseEvent("mousedown",{bubbles:true}))}catch(x){}
- try{e.click()}catch(x){}
- try{i.click()}catch(x){}
-}
-function SO(term,done){
- var i=TI();
- if(!i){alert("未找到“学年学期”下拉框。请先手动选择学期，再点击“CCMU 导出已选学期”。");return;}
- if((i.value||"").trim()===term){done();return;}
- OP(i);
- var n=0,t=setInterval(function(){
-  n++;
-  var es=[].slice.call(document.querySelectorAll(".el-select-dropdown__item,[role=option]"));
-  var op=es.find(function(e){return TX(e)===term&&e.offsetParent!==null})||es.find(function(e){return TX(e)===term});
-  if(op){
-   clearInterval(t);
-   try{op.dispatchEvent(new MouseEvent("mousedown",{bubbles:true}))}catch(x){}
-   try{op.click()}catch(x){}
-   setTimeout(done,450);
-  }else if(n>=50){
-   clearInterval(t);
-   alert("未能在“学年学期”下拉框中找到当前学期 "+term+"。监听已开启，请手动选择该学期后点击“查询”。");
-  }
- },100);
+  var o=typeof x==="string"?JSON.parse(x):x;if(!o||typeof o!=="object")return;
+  D=true;N("已获取课表数据，正在生成 Excel…","info");
+  var m={type:"CCMU_SCHEDULE_DATA",payload:o};
+  function s(){try{if(W&&!W.closed)W.postMessage(m,O)}catch(e){}}
+  s();R=setInterval(s,350);setTimeout(function(){if(R)clearInterval(R)},15000)
+ }catch(e){N("已捕获课表响应，但 JSON 解析失败。","error",6000)}
 }
 function Q(){
  var es=[].slice.call(document.querySelectorAll("button,a,[role=button],.el-button"));
- var b=es.find(function(e){return /^\\s*查询\\s*$/.test(TX(e))});
- if(b){b.click();return true}return false;
+ var b=es.find(function(e){return !e.disabled&&/^\\s*查询\\s*$/.test((e.innerText||e.textContent||"").trim())});
+ if(b){b.click();return true}return false
 }
-function GO(){
- if(!Q())alert("课表接口监听已开启，但没有自动找到“查询”按钮；请手动点击一次“查询”。");
+function OPN(){
+ var u=G+(G.indexOf("?")>=0?"&":"?")+"receiver=1&_="+Date.now(),sw=500,sh=520;
+ var l=Math.max(0,(screen.availWidth||screen.width||1200)-sw-30),tp=60;
+ W=window.open(u,"ccmuScheduleReceiver","popup=yes,width="+sw+",height="+sh+",left="+l+",top="+tp+",resizable=yes,scrollbars=yes");
+ if(!W){N("浏览器阻止了接收窗口。请允许此网站弹出窗口后重新点击书签。","error",0);C();return false}
+ try{W.blur();window.focus()}catch(e){}return true
 }
-if(MODE==="current"){
- var term=GT();
- if(!term){alert("未识别到页面顶部的“当前学期”。请先手动选择学年学期，再使用“CCMU 导出已选学期”。");return;}
- SO(term,GO);
-}else{
- var input=TI(),selected=input&&((input.value||"").trim());
- if(!selected||!/^\\d{4}-\\d{4}-[12]$/.test(selected)){
-  alert("请先在学校课表页面选择“学年学期”，再点击此书签。");return;
+function MSG(e){
+ if(e.origin!==O||!e.data)return;
+ if(e.data.type==="CCMU_SCHEDULE_READY"){A=true;try{W.blur();window.focus()}catch(x){}}
+ if(e.data.type==="CCMU_SCHEDULE_ACK"&&R){clearInterval(R);R=null}
+ if(e.data.type==="CCMU_SCHEDULE_COMPLETE"){
+  N("导出完成："+(e.data.fileName||"课表.xlsx"),"success",4500);C();window.removeEventListener("message",MSG);try{window.focus()}catch(x){}
  }
- GO();
+ if(e.data.type==="CCMU_SCHEDULE_ERROR"){
+  N("生成失败："+(e.data.message||"未知错误"),"error",8000);C();window.removeEventListener("message",MSG)
+ }
 }
-setTimeout(function(){if(!D)alert("暂未捕获到课表接口。请确认学年学期选择正确，并再点击一次“查询”。")},10000);
+window.addEventListener("message",MSG);
+if(!OPN())return;
+if(F0)window.fetch=async function(){
+ var r=await F0.apply(this,arguments);
+ try{var a=arguments[0],u=typeof a==="string"?a:(a&&a.url);if(M(u))r.clone().text().then(P)}catch(e){}
+ return r
+};
+X.open=function(m,u){this.__ccmuScheduleUrl=u;return OO.apply(this,arguments)};
+X.send=function(){
+ if(M(this.__ccmuScheduleUrl))this.addEventListener("load",function(){try{P(this.responseType==="json"?this.response:this.responseText)}catch(e){}},{once:true});
+ return SS.apply(this,arguments)
+};
+var sem=S();N("正在导出"+(sem?"学期 "+sem:"当前已选择的学期")+"，请保持本页打开…","info");
+setTimeout(function(){
+ if(!Q())N("未自动找到“查询”按钮。监听仍已开启，请手动点击一次“查询”。","warn",8000)
+},300);
+setTimeout(function(){if(!D)N("暂未捕获到课表接口。请确认已选择学期；如页面尚未查询，可手动点击“查询”。","warn",10000)},9000);
+TO=setTimeout(function(){if(!D){N("本次监听已结束，请重新点击导出书签再试。","error",6000);C();window.removeEventListener("message",MSG);try{if(W&&!W.closed)W.close()}catch(e){}}},60000)
 })()`;
-  return code.replace(/\n+/g,"").replace(/\s{2,}/g," ");
+  return code.replace(/\n+/g, "").replace(/\s{2,}/g, " ");
 }
