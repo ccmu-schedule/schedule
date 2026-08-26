@@ -23,6 +23,8 @@ const statusEl = document.getElementById("status");
 const diagnosticsEl = document.getElementById("diagnostics");
 const bookmarkletLink = document.getElementById("bookmarkletLink");
 const copyBookmarkletBtn = document.getElementById("copyBookmarkletBtn");
+const selectedBookmarkletLink = document.getElementById("selectedBookmarkletLink");
+const copySelectedBookmarkletBtn = document.getElementById("copySelectedBookmarkletBtn");
 
 generateBtn.addEventListener("click", () => processAndGenerate(jsonInput.value, "手动粘贴"));
 
@@ -443,23 +445,37 @@ async function generateExcel(result) {
 function setupBookmarklet() {
   const generator = new URL(".", window.location.href);
   generator.search=""; generator.hash="";
-  const code = buildBookmarklet(generator.href);
-  bookmarkletLink.href = `javascript:${code}`;
+
+  const currentCode = buildBookmarklet(generator.href, "current");
+  const selectedCode = buildBookmarklet(generator.href, "selected");
+
+  bookmarkletLink.href = `javascript:${currentCode}`;
+  selectedBookmarkletLink.href = `javascript:${selectedCode}`;
 
   copyBookmarkletBtn.addEventListener("click", async () => {
     try {
-      await navigator.clipboard.writeText(`javascript:${code}`);
-      setStatus("书签代码已复制。新建书签并粘贴到网址/URL 栏即可。", "success");
+      await navigator.clipboard.writeText(`javascript:${currentCode}`);
+      setStatus("“当前学期一键导出”书签代码已复制。新建书签并粘贴到网址/URL 栏即可。", "success");
     } catch (_) {
-      setStatus("浏览器不允许自动复制；直接把蓝色链接拖到书签栏即可。", "info");
+      setStatus("浏览器不允许自动复制；直接把“CCMU 当前学期一键导出”拖到书签栏即可。", "info");
+    }
+  });
+
+  copySelectedBookmarkletBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(`javascript:${selectedCode}`);
+      setStatus("“导出已选学期”书签代码已复制。新建书签并粘贴到网址/URL 栏即可。", "success");
+    } catch (_) {
+      setStatus("浏览器不允许自动复制；直接把“CCMU 导出已选学期”拖到书签栏即可。", "info");
     }
   });
 }
 
-function buildBookmarklet(generatorUrl) {
+function buildBookmarklet(generatorUrl, mode = "current") {
   const G = JSON.stringify(generatorUrl);
+  const MODE = JSON.stringify(mode);
   const code = `(function(){
-var G=${G},O=(new URL(G)).origin,W=window.open(G,"ccmuScheduleExporter"),D=false,T=null;
+var G=${G},MODE=${MODE},O=(new URL(G)).origin,W=window.open(G,"ccmuScheduleExporter"),D=false,T=null;
 if(!W){alert("请允许本页打开弹窗后重试。");return;}
 function M(u){return String(u||"").indexOf("queryStudentSchedule")>=0}
 function P(x){
@@ -489,13 +505,62 @@ X.send=function(){
  },{once:true});
  return SS.apply(this,arguments);
 };
+function TX(e){return((e&&e.innerText)||(e&&e.textContent)||"").trim()}
+function GT(){
+ var m=(document.body.innerText||"").match(/当前学期\\s*[:：]\\s*(\\d{4}-\\d{4}-[12])/);
+ return m?m[1]:"";
+}
+function TI(){
+ var a=[].slice.call(document.querySelectorAll("input"));
+ return a.find(function(i){return /^\\d{4}-\\d{4}-[12]$/.test((i.value||"").trim())})||
+        a.find(function(i){var p=i.closest&&i.closest(".el-select");return p&&/学年学期/.test(TX(p.parentElement||p))});
+}
+function OP(i){
+ var e=(i.closest&&i.closest(".el-select"))||i.parentElement||i;
+ try{e.dispatchEvent(new MouseEvent("mousedown",{bubbles:true}))}catch(x){}
+ try{e.click()}catch(x){}
+ try{i.click()}catch(x){}
+}
+function SO(term,done){
+ var i=TI();
+ if(!i){alert("未找到“学年学期”下拉框。请先手动选择学期，再点击“CCMU 导出已选学期”。");return;}
+ if((i.value||"").trim()===term){done();return;}
+ OP(i);
+ var n=0,t=setInterval(function(){
+  n++;
+  var es=[].slice.call(document.querySelectorAll(".el-select-dropdown__item,[role=option]"));
+  var op=es.find(function(e){return TX(e)===term&&e.offsetParent!==null})||es.find(function(e){return TX(e)===term});
+  if(op){
+   clearInterval(t);
+   try{op.dispatchEvent(new MouseEvent("mousedown",{bubbles:true}))}catch(x){}
+   try{op.click()}catch(x){}
+   setTimeout(done,450);
+  }else if(n>=50){
+   clearInterval(t);
+   alert("未能在“学年学期”下拉框中找到当前学期 "+term+"。监听已开启，请手动选择该学期后点击“查询”。");
+  }
+ },100);
+}
 function Q(){
  var es=[].slice.call(document.querySelectorAll("button,a,[role=button],.el-button"));
- var b=es.find(function(e){return /^\\s*查询\\s*$/.test((e.innerText||e.textContent||"").trim())});
+ var b=es.find(function(e){return /^\\s*查询\\s*$/.test(TX(e))});
  if(b){b.click();return true}return false;
 }
-if(!Q())alert("监听已开启，请在课表页面点击一次“查询”。");
-setTimeout(function(){if(!D)alert("暂未捕获到课表接口。请确认当前在课表页，并再点击一次“查询”。")},8000);
+function GO(){
+ if(!Q())alert("课表接口监听已开启，但没有自动找到“查询”按钮；请手动点击一次“查询”。");
+}
+if(MODE==="current"){
+ var term=GT();
+ if(!term){alert("未识别到页面顶部的“当前学期”。请先手动选择学年学期，再使用“CCMU 导出已选学期”。");return;}
+ SO(term,GO);
+}else{
+ var input=TI(),selected=input&&((input.value||"").trim());
+ if(!selected||!/^\\d{4}-\\d{4}-[12]$/.test(selected)){
+  alert("请先在学校课表页面选择“学年学期”，再点击此书签。");return;
+ }
+ GO();
+}
+setTimeout(function(){if(!D)alert("暂未捕获到课表接口。请确认学年学期选择正确，并再点击一次“查询”。")},10000);
 })()`;
   return code.replace(/\n+/g,"").replace(/\s{2,}/g," ");
 }
