@@ -8,32 +8,32 @@
 </head>
 <body>
   <main class="container">
-    <h1>首都医科大学在线课表生成器 <small style="font-size:.45em;color:#888;">V4</small></h1>
+    <h1>首都医科大学在线课表生成器 <small style="font-size:.45em;color:#888;">V3</small></h1>
 
     <section class="card one-click-card">
-      <h2>一键导出已选学期（推荐）</h2>
+      <h2>一键导出</h2>
       <p>
-        首次使用时，把下面的蓝色链接<strong>拖到浏览器书签栏</strong>。以后先在学校课表页面选择需要导出的
-        “学年学期”，再点击书签即可；脚本会自动点击“查询”，等待课表刷新完成后直接读取页面中的课程、教师、教室和周次信息，再生成 Excel。
+        首次使用时，先把下面的蓝色链接<strong>拖拽到浏览器书签栏</strong>。
+        后续操作时，先在教务系统课表页面<strong>手动选择“学年学期”</strong>，再点击书签后即可自动导出。
       </p>
       <div class="actions">
-        <a id="bookmarkletLink" class="button-link" href="#" title="拖到书签栏">CCMU 导出已选学期</a>
+        <a id="bookmarkletLink" class="button-link" href="#" title="拖到书签栏">导出已选学期课表</a>
         <button id="copyBookmarkletBtn" type="button" class="secondary-btn">复制书签代码</button>
       </div>
       <p class="privacy-note">
-        ✨ 导出时会创建一个小型“接收窗口”用于生成 XLSX。脚本会立即尝试把焦点还给课表页；下载完成后接收窗口会自动关闭，正常情况下无需操作它。
+        ✨ 导出时会创建一个小型“接收窗口”用于生成 XLSX，下载完成后接收窗口会自动关闭，正常情况下无需操作它。
         如果浏览器阻止弹出窗口，只需允许学校课表页弹窗后重新点击书签。
       </p>
       <p class="privacy-note">
-        🔒 账号密码和 Cookie 不会发送给生成器；只会把当前页面已经渲染出的课表数据通过浏览器 <code>postMessage</code> 传给生成器。
+        🔒 页面加载后，课表解析和 XLSX 生成均在浏览器本地完成。
       </p>
       <p class="privacy-note"><a href="https://graduate-443.webvpn.ccmu.edu.cn/#/student/courseManage/timetable" target="_blank" rel="noopener noreferrer">打开教务系统课表页</a></p>
     </section>
 
     <section class="card">
-      <h2>手动解析（备用）</h2>
-      <p>也可以继续把 Network → <code>queryStudentSchedule</code> → Response 中的 JSON 完整粘贴到下方。</p>
-      <p class="privacy-note">✨ 页面加载后，课表解析和 XLSX 生成均在浏览器本地完成。</p>
+      <h2>手动导出（备用）</h2>
+      <p>把 Network → <code>queryStudentSchedule</code> → Response 中的 JSON 完整粘贴到下方。</p>
+      <p class="privacy-note">🔒 页面加载后，课表解析和 XLSX 生成均在浏览器本地完成。</p>
       <textarea id="jsonInput" placeholder="在此处粘贴 queryStudentSchedule 的 Response JSON..."></textarea>
       <div class="actions">
         <button id="generateBtn" type="button">解析并生成课表 (.xlsx)</button>
