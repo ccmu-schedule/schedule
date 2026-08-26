@@ -11,12 +11,23 @@
     <h1>首都医科大学在线课表生成器</h1>
 
     <section class="card one-click-card">
-      <h2>一键导出（测试中）</h2>
-      <p>首次使用时，把下面的蓝色链接<strong>拖到浏览器书签栏</strong>。之后登录教务系统并打开课表页面，只需点一次这个书签，它会监听 <code>queryStudentSchedule</code> 的响应并交给本页面自动生成 Excel。</p>
+      <h2>一键导出（推荐）</h2>
+      <p>首次使用时，把下面需要的蓝色链接<strong>拖到浏览器书签栏</strong>。课表接口与“学年学期”相关，所以脚本现在会先处理学期，再触发“查询”。</p>
+
+      <h3>当前学期（最省事）</h3>
+      <p>点击书签后，会自动读取学校页面顶部的“当前学期”，自动切换“学年学期”下拉框，再点击“查询”并抓取课表。</p>
       <div class="actions">
-        <a id="bookmarkletLink" class="button-link" href="#" title="拖到书签栏">CCMU 一键导出课表</a>
-        <button id="copyBookmarkletBtn" type="button" class="secondary-btn">复制书签代码</button>
+        <a id="bookmarkletLink" class="button-link" href="#" title="拖到书签栏">CCMU 当前学期一键导出</a>
+        <button id="copyBookmarkletBtn" type="button" class="secondary-btn">复制当前学期书签</button>
       </div>
+
+      <h3 class="subheading">历史/指定学期</h3>
+      <p>先在学校课表页面手动选择你想导出的“学年学期”，然后点击下面这个书签；脚本会保留当前选择并直接查询。</p>
+      <div class="actions">
+        <a id="selectedBookmarkletLink" class="button-link secondary-link" href="#" title="拖到书签栏">CCMU 导出已选学期</a>
+        <button id="copySelectedBookmarkletBtn" type="button" class="secondary-btn">复制已选学期书签</button>
+      </div>
+
       <p class="privacy-note">🔒 账号密码和 Cookie 不会发送给生成器；书签脚本只把课表接口 JSON 通过浏览器 <code>postMessage</code> 传给本页面。</p>
       <p class="privacy-note"><a href="https://graduate-443.webvpn.ccmu.edu.cn/#/student/courseManage/timetable" target="_blank" rel="noopener noreferrer">打开教务系统课表页</a></p>
     </section>
