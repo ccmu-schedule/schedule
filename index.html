@@ -1,26 +1,41 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线课表生成器</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首都医科大学在线课表生成器</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>在线课表生成器</h1>
-        <p>请将从教务系统获取的JSON数据完整粘贴到下方文本框中，然后点击“生成课表”按钮</p>
-        <p class="privacy-note">✨ 本页面加载成功后可断网使用，所有数据处理均在您的浏览器本地完成，不会上传服务器</p>
-        <p class="privacy-note"><a href="https://github.com/ccmu-schedule/schedule/blob/main/README.md" target="_blank" rel="noopener noreferrer">获取课表json代码教程</a></p>
-        
-        <textarea id="jsonInput" placeholder="在此处粘贴您的JSON代码..."></textarea>
-        
-        <button id="generateBtn">生成课表 (.xlsx)</button>
-        
-        <div id="status"></div>
-    </div>
+  <main class="container">
+    <h1>首都医科大学在线课表生成器</h1>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <script src="script.js"></script>
+    <section class="card one-click-card">
+      <h2>一键导出（推荐）</h2>
+      <p>首次使用时，把下面的蓝色链接<strong>拖到浏览器书签栏</strong>。之后登录教务系统并打开课表页面，只需点一次这个书签，它会监听 <code>queryStudentSchedule</code> 的响应并交给本页面自动生成 Excel。</p>
+      <div class="actions">
+        <a id="bookmarkletLink" class="button-link" href="#" title="拖到书签栏">CCMU 一键导出课表</a>
+        <button id="copyBookmarkletBtn" type="button" class="secondary-btn">复制书签代码</button>
+      </div>
+      <p class="privacy-note">🔒 账号密码和 Cookie 不会发送给生成器；书签脚本只把课表接口 JSON 通过浏览器 <code>postMessage</code> 传给本页面。</p>
+      <p class="privacy-note"><a href="https://graduate-443.webvpn.ccmu.edu.cn/#/student/courseManage/timetable" target="_blank" rel="noopener noreferrer">打开教务系统课表页</a></p>
+    </section>
+
+    <section class="card">
+      <h2>手动解析（备用）</h2>
+      <p>也可以继续把 Network → <code>queryStudentSchedule</code> → Response 中的 JSON 完整粘贴到下方。</p>
+      <p class="privacy-note">✨ 页面加载后，课表解析和 XLSX 生成均在浏览器本地完成。</p>
+      <textarea id="jsonInput" placeholder="在此处粘贴 queryStudentSchedule 的 Response JSON..."></textarea>
+      <div class="actions">
+        <button id="generateBtn" type="button">解析并生成课表 (.xlsx)</button>
+        <button id="pasteBtn" type="button" class="secondary-btn">从剪贴板读取</button>
+      </div>
+      <div id="status" role="status" aria-live="polite"></div>
+      <pre id="diagnostics" class="diagnostics" hidden></pre>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
