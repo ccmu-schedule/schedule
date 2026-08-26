@@ -1,6 +1,6 @@
 # 首都医科大学EXCEL课表生成工具V3.0 👋
 
-## 一键导出（v3.0新增，需使用电脑，推荐用chrome浏览器）
+## 一键导出（v3.0新增，需使用电脑，目前只支持chrome浏览器）
 
 ### 第一步（方式1）：拖拽设置书签，将“导出已选学期课表”按钮拖拽到浏览器书签栏
 <img width="1446" height="720" alt="image" src="https://github.com/user-attachments/assets/13e1ea32-30ea-4376-bcaa-b0512d646901" />
