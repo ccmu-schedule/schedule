@@ -498,80 +498,234 @@ function setupBookmarklet() {
 
 function buildBookmarklet(generatorUrl) {
   const G = JSON.stringify(generatorUrl);
+
   const code = `(function(){
 if(window.__CCMU_SCHEDULE_EXPORTING__){N("已有导出任务正在运行，请稍候。","warn",3500);return}
 window.__CCMU_SCHEDULE_EXPORTING__=true;
-var G=${G},O=(new URL(G)).origin,W=null,D=false,A=false,R=null,F0=window.fetch,X=XMLHttpRequest.prototype,OO=X.open,SS=X.send,TO=null;
+var G=${G},O=(new URL(G)).origin,W=null,R=null,TO=null,D=false,SEM="";
+
+function TXT(e){
+ return String((e&&e.textContent)||"").replace(/[\\s\\u00a0]+/g,"").trim()
+}
 function N(m,t,d){
  var id="__ccmu_schedule_notice__",n=document.getElementById(id);
- if(!n){n=document.createElement("div");n.id=id;n.style.cssText="position:fixed;z-index:2147483647;right:20px;top:20px;max-width:420px;padding:13px 16px;border-radius:9px;background:#23364d;color:#fff;font:14px/1.55 -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.25);white-space:pre-wrap;transition:opacity .2s";document.documentElement.appendChild(n)}
- n.textContent=m;n.style.background=t==="error"?"#b93636":t==="success"?"#218c55":t==="warn"?"#8a6418":"#23364d";n.style.opacity="1";
- clearTimeout(n.__timer);if(d)n.__timer=setTimeout(function(){n.style.opacity="0";setTimeout(function(){try{n.remove()}catch(e){}},250)},d)
+ if(!n){
+  n=document.createElement("div");n.id=id;
+  n.style.cssText="position:fixed;z-index:2147483647;right:20px;top:20px;max-width:430px;padding:13px 16px;border-radius:9px;background:#23364d;color:#fff;font:14px/1.55 -apple-system,BlinkMacSystemFont,Segoe UI,Arial,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.25);white-space:pre-wrap;transition:opacity .2s";
+  document.documentElement.appendChild(n)
+ }
+ n.textContent=m;
+ n.style.background=t==="error"?"#b93636":t==="success"?"#218c55":t==="warn"?"#8a6418":"#23364d";
+ n.style.opacity="1";
+ clearTimeout(n.__timer);
+ if(d)n.__timer=setTimeout(function(){n.style.opacity="0";setTimeout(function(){try{n.remove()}catch(e){}},250)},d)
 }
 function C(){
- try{if(F0)window.fetch=F0;X.open=OO;X.send=SS}catch(e){}
- if(R)clearInterval(R);if(TO)clearTimeout(TO);window.__CCMU_SCHEDULE_EXPORTING__=false
+ if(R)clearInterval(R);
+ if(TO)clearTimeout(TO);
+ window.__CCMU_SCHEDULE_EXPORTING__=false
 }
-function M(u){return String(u||"").indexOf("queryStudentSchedule")>=0}
 function S(){
- var vals=[];
- [].slice.call(document.querySelectorAll("input,[role=combobox],.el-select,.el-input")).forEach(function(e){
-  var v=(e.value||e.getAttribute&&e.getAttribute("value")||e.innerText||e.textContent||"").trim();
-  var m=v.match(/20\\d{2}-20\\d{2}-[12]/);if(m)vals.push(m[0])
- });
- return vals[0]||""
+ var root=document.querySelector("div#semesterId.ant-select")||document.querySelector("#semesterId.ant-select")||document.querySelector("[id=semesterId].ant-select");
+ if(root){
+  var v=root.querySelector(".ant-select-selection-selected-value");
+  var s=((v&&v.getAttribute("title"))||(v&&v.textContent)||"").trim();
+  var m=s.match(/20\\d{2}-20\\d{2}-[12]/);
+  if(m)return m[0]
+ }
+ var label=document.querySelector('label[for="semesterId"]');
+ if(label){
+  var item=label.closest(".ant-form-item");
+  var v2=item&&item.querySelector(".ant-select-selection-selected-value");
+  var s2=((v2&&v2.getAttribute("title"))||(v2&&v2.textContent)||"").trim();
+  var m2=s2.match(/20\\d{2}-20\\d{2}-[12]/);
+  if(m2)return m2[0]
+ }
+ return ""
 }
-function P(x){
- if(D)return;
- try{
-  var o=typeof x==="string"?JSON.parse(x):x;if(!o||typeof o!=="object")return;
-  D=true;N("已获取课表数据，正在生成 Excel…","info");
-  var m={type:"CCMU_SCHEDULE_DATA",payload:o};
-  function s(){try{if(W&&!W.closed)W.postMessage(m,O)}catch(e){}}
-  s();R=setInterval(s,350);setTimeout(function(){if(R)clearInterval(R)},15000)
- }catch(e){N("已捕获课表响应，但 JSON 解析失败。","error",6000)}
-}
-function Q(){
- var es=[].slice.call(document.querySelectorAll("button,a,[role=button],.el-button"));
- var b=es.find(function(e){return !e.disabled&&/^\\s*查询\\s*$/.test((e.innerText||e.textContent||"").trim())});
- if(b){b.click();return true}return false
+function QB(){
+ var es=[].slice.call(document.querySelectorAll("form button,button"));
+ for(var i=0;i<es.length;i++){
+  var e=es[i];
+  if(e.disabled)continue;
+  var t=TXT(e);
+  if(t==="查询"){
+   if(e.classList&&e.classList.contains("ant-btn-background-ghost"))continue;
+   return e
+  }
+ }
+ return null
 }
 function OPN(){
- var u=G+(G.indexOf("?")>=0?"&":"?")+"receiver=1&_="+Date.now(),sw=500,sh=520;
- var l=Math.max(0,(screen.availWidth||screen.width||1200)-sw-30),tp=60;
+ var u=G+(G.indexOf("?")>=0?"&":"?")+"receiver=1&_="+Date.now(),sw=460,sh=390;
+ var l=Math.max(0,(screen.availWidth||screen.width||1200)-sw-24),tp=55;
  W=window.open(u,"ccmuScheduleReceiver","popup=yes,width="+sw+",height="+sh+",left="+l+",top="+tp+",resizable=yes,scrollbars=yes");
- if(!W){N("浏览器阻止了接收窗口。请允许此网站弹出窗口后重新点击书签。","error",0);C();return false}
- try{W.blur();window.focus()}catch(e){}return true
+ if(!W){
+  N("浏览器阻止了接收窗口。请允许本网站弹出窗口后重新点击书签。","error",0);
+  C();return false
+ }
+ try{W.blur();window.focus()}catch(e){}
+ return true
+}
+function SIG(){
+ var tb=document.querySelector(".scheduleTable .ant-table-tbody")||document.querySelector(".ant-table-tbody");
+ return tb?String(tb.innerText||tb.textContent||"").replace(/\\s+/g,"").slice(0,30000):""
+}
+function BUSY(){
+ return !!document.querySelector(".scheduleTable .ant-spin-spinning,.scheduleTable .ant-spin-dot-spin,.ant-spin-spinning")
+}
+function ROOM(x){
+ var s=String(x||"").trim(),m=s.match(/^(.*)\\[([^\\]]+)\\]\\s*$/);
+ return m?{room:m[1].trim()||"线上教学",weeks:m[2].trim()}:{room:s||"线上教学",weeks:""}
+}
+function CELL(td){
+ var labs=[].slice.call(td.querySelectorAll("label"));
+ var out=[],cur=null;
+ function push(){
+  if(!cur)return;
+  if(cur.className){
+   if(!cur.teacherName)cur.teacherName="教师未提供";
+   if(!cur.classroomName)cur.classroomName="线上教学";
+   cur.semesterId=SEM;
+   out.push(cur)
+  }
+  cur=null
+ }
+ for(var i=0;i<labs.length;i++){
+  var lab=labs[i],svg=lab.querySelector("svg[data-icon]"),typ=svg?svg.getAttribute("data-icon"):"",txt=(lab.textContent||"").trim();
+  if(!txt)continue;
+  if(typ==="calculator"){
+   push();cur={className:txt,teacherName:"",classroomName:"",weeks:"",semesterId:SEM}
+  }else if(typ==="user"&&cur){
+   cur.teacherName=txt
+  }else if(typ==="environment"&&cur){
+   var rr=ROOM(txt);cur.classroomName=rr.room;cur.weeks=rr.weeks
+  }
+ }
+ push();
+ return out.filter(function(x){return x.className&&x.weeks})
+}
+function SCRAPE(){
+ var body=document.querySelector(".scheduleTable .ant-table-tbody")||document.querySelector(".ant-table-tbody");
+ if(!body)throw new Error("未找到课表表格");
+ var rows=[].slice.call(body.querySelectorAll(":scope > tr"));
+ if(!rows.length)rows=[].slice.call(body.querySelectorAll("tr"));
+ if(!rows.length)throw new Error("课表表格中没有节次行");
+
+ var days=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+ var sec=[];
+ for(var r=0;r<12;r++){
+  sec.push({key:r,section:"第"+(r+1)+"节",monday:[],tuesday:[],wednesday:[],thursday:[],friday:[],saturday:[],sunday:[]})
+ }
+ var occ=[];
+ for(var rr=0;rr<12;rr++)occ.push([false,false,false,false,false,false,false]);
+
+ rows.forEach(function(tr,ri){
+  var p=parseInt(tr.getAttribute("data-row-key"),10);
+  if(!(p>=0&&p<12)){
+   var first=tr.querySelector("td"),mm=(first&&first.textContent||"").match(/第\\s*(\\d+)\\s*节/);
+   p=mm?parseInt(mm[1],10)-1:ri
+  }
+  if(!(p>=0&&p<12))return;
+
+  var tds=[].slice.call(tr.children).filter(function(x){return x.tagName==="TD"});
+  if(!tds.length)return;
+  tds=tds.slice(1);
+  var dc=0;
+
+  tds.forEach(function(td){
+   while(dc<7&&occ[p][dc])dc++;
+   if(dc>=7)return;
+   var courses=CELL(td),span=parseInt(td.getAttribute("rowspan")||"1",10);
+   if(!(span>0))span=1;
+   for(var k=0;k<span&&p+k<12;k++){
+    occ[p+k][dc]=true;
+    if(courses.length){
+     courses.forEach(function(c){sec[p+k][days[dc]].push(Object.assign({},c))})
+    }
+   }
+   dc++
+  })
+ });
+
+ var count=0;
+ sec.forEach(function(s){days.forEach(function(d){count+=s[d].length})});
+ if(!count)throw new Error("查询完成，但当前表格中没有识别到课程。请确认该学期确实有课表数据。");
+ return {code:200,data:sec}
+}
+function SEND(payload){
+ if(D)return;
+ D=true;
+ N("已读取学期 "+SEM+" 的课表，正在生成 Excel…","info");
+ var m={type:"CCMU_SCHEDULE_DATA",payload:payload};
+ function s(){try{if(W&&!W.closed)W.postMessage(m,O)}catch(e){}}
+ s();R=setInterval(s,350);
+ setTimeout(function(){if(R){clearInterval(R);R=null}},15000)
+}
+function FAIL(msg){
+ N(msg,"error",8000);C();window.removeEventListener("message",MSG);
+ try{if(W&&!W.closed)W.close()}catch(e){}
 }
 function MSG(e){
  if(e.origin!==O||!e.data)return;
- if(e.data.type==="CCMU_SCHEDULE_READY"){A=true;try{W.blur();window.focus()}catch(x){}}
+ if(e.data.type==="CCMU_SCHEDULE_READY"){try{W.blur();window.focus()}catch(x){}}
  if(e.data.type==="CCMU_SCHEDULE_ACK"&&R){clearInterval(R);R=null}
  if(e.data.type==="CCMU_SCHEDULE_COMPLETE"){
-  N("导出完成："+(e.data.fileName||"课表.xlsx"),"success",4500);C();window.removeEventListener("message",MSG);try{window.focus()}catch(x){}
+  N("导出完成："+(e.data.fileName||"课表.xlsx"),"success",4500);
+  C();window.removeEventListener("message",MSG);try{window.focus()}catch(x){}
  }
  if(e.data.type==="CCMU_SCHEDULE_ERROR"){
-  N("生成失败："+(e.data.message||"未知错误"),"error",8000);C();window.removeEventListener("message",MSG)
+  FAIL("生成失败："+(e.data.message||"未知错误"))
  }
+}
+
+SEM=S();
+if(!SEM){
+ N("未读取到“学年学期”的已选值。请先在页面下拉框中选择学期，再点击导出书签。","error",8000);
+ C();return
+}
+var q=QB();
+if(!q){
+ N("未找到课表页面的“查询”按钮。请确认当前位于“课程管理 / 课表查看”页面。","error",8000);
+ C();return
 }
 window.addEventListener("message",MSG);
 if(!OPN())return;
-if(F0)window.fetch=async function(){
- var r=await F0.apply(this,arguments);
- try{var a=arguments[0],u=typeof a==="string"?a:(a&&a.url);if(M(u))r.clone().text().then(P)}catch(e){}
- return r
-};
-X.open=function(m,u){this.__ccmuScheduleUrl=u;return OO.apply(this,arguments)};
-X.send=function(){
- if(M(this.__ccmuScheduleUrl))this.addEventListener("load",function(){try{P(this.responseType==="json"?this.response:this.responseText)}catch(e){}},{once:true});
- return SS.apply(this,arguments)
-};
-var sem=S();N("正在导出"+(sem?"学期 "+sem:"当前已选择的学期")+"，请保持本页打开…","info");
-setTimeout(function(){
- if(!Q())N("未自动找到“查询”按钮。监听仍已开启，请手动点击一次“查询”。","warn",8000)
-},300);
-setTimeout(function(){if(!D)N("暂未捕获到课表接口。请确认已选择学期；如页面尚未查询，可手动点击“查询”。","warn",10000)},9000);
-TO=setTimeout(function(){if(!D){N("本次监听已结束，请重新点击导出书签再试。","error",6000);C();window.removeEventListener("message",MSG);try{if(W&&!W.closed)W.close()}catch(e){}}},60000)
+
+var before=SIG(),start=Date.now(),sawBusy=false,lastSig=before,lastChange=Date.now();
+N("正在查询并导出学期 "+SEM+"…","info");
+
+try{q.click()}catch(e){FAIL("自动点击“查询”失败："+e.message);return}
+
+var poll=setInterval(function(){
+ if(D){clearInterval(poll);return}
+ var now=Date.now(),busy=BUSY(),sig=SIG();
+ if(busy)sawBusy=true;
+ if(sig!==lastSig){lastSig=sig;lastChange=now}
+
+ var elapsed=now-start;
+ var stable=now-lastChange>450;
+ var ready=
+   (!busy&&sawBusy&&elapsed>350&&stable) ||
+   (!busy&&sig!==before&&elapsed>500&&stable) ||
+   (!busy&&elapsed>2600&&stable);
+
+ if(ready){
+  clearInterval(poll);
+  try{SEND(SCRAPE())}
+  catch(e){FAIL("课表读取失败："+e.message)}
+ }else if(elapsed>15000){
+  clearInterval(poll);
+  try{SEND(SCRAPE())}
+  catch(e){FAIL("查询等待超时，且无法读取课表："+e.message)}
+ }
+},180);
+
+TO=setTimeout(function(){
+ if(!D){clearInterval(poll);FAIL("导出超时，请重新点击书签再试。")}
+},30000)
 })()`;
+
   return code.replace(/\n+/g, "").replace(/\s{2,}/g, " ");
 }
+
