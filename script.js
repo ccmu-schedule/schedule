@@ -32,7 +32,7 @@ window.addEventListener("message", async (event) => {
     if (!isAllowedSchoolOrigin(event.origin)) return;
     if (!event.data || event.data.type !== "CCMU_SCHEDULE_DATA") return;
 
-    // V5：接收窗口和书签任务通过 token 一一绑定。
+    // v3：接收窗口和书签任务通过 token 一一绑定。
     // 旧导出任务即使稍后才返回，也不能进入本次生成流程。
     if (receiverToken && event.data.token !== receiverToken) return;
 
@@ -129,7 +129,7 @@ async function processAndGenerate(input, source) {
             throw new Error("ExcelJS 加载失败，请检查网络或改为仓库内本地引用");
         }
 
-        // V5 按用户最初 script (1).js 的方式解析 JSON：
+        // v3 按用户最初 script (1).js 的方式解析 JSON：
         // 手动输入时只做一次 JSON.parse；收到书签传来的对象时直接交给 generateExcel。
         const jsonData = (input && typeof input === "object")
             ? input
@@ -263,7 +263,7 @@ async function generateExcel(jsonData) {
         }
     });
 
-    // V5 安全保护：解析规则保持原版不变，但不再允许 maxWeek=0 时写出空工作簿。
+    // v3 安全保护：解析规则保持原版不变，但不再允许 maxWeek=0 时写出空工作簿。
     // 这不是字段兼容逻辑；只是防止无有效课程时生成 Excel 无法正常打开的空 XLSX。
     if (maxWeek < 1) {
         throw new Error("未按原始 JSON 结构解析到有效课程数据，已阻止生成空工作簿");
@@ -474,7 +474,7 @@ function setupBookmarklet() {
     copyBookmarkletBtn.addEventListener("click", async () => {
         try {
             await navigator.clipboard.writeText(fullCode);
-            setStatus("V5 书签代码已复制。请替换浏览器里旧的 CCMU 导出书签。", "success");
+            setStatus("v3 书签代码已复制。请替换浏览器里旧的 CCMU 导出书签。", "success");
         } catch (_) {
             setStatus("浏览器不允许自动复制；请把蓝色“CCMU 导出已选学期”重新拖到书签栏。", "info");
         }
@@ -487,7 +487,7 @@ function buildBookmarklet(generatorUrl) {
     const code = `(function(){
 var OLD=window.__CCMU_SCHEDULE_EXPORT_TOKEN__;
 if(OLD){NOTICE("已有导出任务正在运行，请等待完成或刷新课表页面后重试。","warn",5000);return}
-var G=${G},O=(new URL(G)).origin,TOKEN="v5-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10);
+var G=${G},O=(new URL(G)).origin,TOKEN="v3-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,10);
 window.__CCMU_SCHEDULE_EXPORT_TOKEN__=TOKEN;
 
 var SEM="",W=null,ACK_TIMER=null,TIMEOUT=null,POLL=null,DONE=false,START=0,ARMED=false,SEEN_REQUEST=false,LAST_CHANGE=0,BEFORE_SIG="",LAST_SIG="";
@@ -641,11 +641,11 @@ function INSTALL(){
   window.fetch=FW
  }
  XO=function(method,url){
-  this.__ccmuV5={url:String(url||""),method:String(method||"GET")};
+  this.__ccmuv3={url:String(url||""),method:String(method||"GET")};
   return OO.apply(this,arguments)
  };
  XS=function(body){
-  var meta=this.__ccmuV5||{},candidate=ACTIVE()&&ARMED&&Date.now()>=START&&IS_QUERY_URL(meta.url);
+  var meta=this.__ccmuv3||{},candidate=ACTIVE()&&ARMED&&Date.now()>=START&&IS_QUERY_URL(meta.url);
   if(candidate){
    SEEN_REQUEST=true;
    if(!REQUEST_SEMESTER_OK(meta.url,body)){
@@ -774,7 +774,7 @@ LAST_CHANGE=Date.now();
 INSTALL();
 START=Date.now();
 ARMED=true;
-NOTICE("V5 正在查询学期 "+SEM+"。只会使用本次点击后返回的 queryStudentSchedule 数据；旧课表不会参与生成。","info");
+NOTICE("v3 正在查询学期 "+SEM+"。只会使用本次点击后返回的 queryStudentSchedule 数据；旧课表不会参与生成。","info");
 
 try{Q.click()}catch(e){FAIL("自动点击“查询”失败："+e.message);return}
 
