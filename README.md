@@ -20,6 +20,7 @@
 <img width="377" height="138" alt="image" src="https://github.com/user-attachments/assets/7a6347a5-023a-46b6-a76c-7cd99a41b146" />
 
 ### 第四步：等待课表自动导出
+<img width="451" height="274" alt="UQR4_OF_$OOPN7Y{6NX}DJI" src="https://github.com/user-attachments/assets/8a00f6ff-4a96-4c24-8fca-db52b0230fc7" />
 <img width="523" height="75" alt="$_~QN8LYS $LONWHN$S7)@1" src="https://github.com/user-attachments/assets/8b9debcb-d4dd-4b02-9bdd-7664d2447bd8" />
 <img width="263" height="46" alt="3T {LL`Q6)2BH53`)PR 8RM" src="https://github.com/user-attachments/assets/ee63f9d6-0344-4436-bfd4-ebdf75e330d7" />
 
