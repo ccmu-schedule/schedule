@@ -29,7 +29,7 @@
 ### 第四步：点击对应日志记录（通常以queryStudentSchedule开头），并选择“Response”
 <img width="771" height="615" alt="image" src="https://github.com/user-attachments/assets/04ba0371-4a1d-419c-913a-652f8cb9521b" />
 
-### 第五步：复制下方json代码（可使用快捷键Ctrl+A全选）到在线课表生成器网页中，点击“生成课表”
+### 第五步：复制下方json代码（可使用快捷键Ctrl+A全选、Ctrl+C复制、Ctrl+V粘贴）到在线课表生成器网页中，点击“生成课表”
 <img width="1531" height="948" alt="image" src="https://github.com/user-attachments/assets/59bb4b20-82d9-49dc-95f6-57e80442073c" />
 
 
