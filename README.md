@@ -14,7 +14,7 @@
 
 
 ### 第二步：登陆教务系统，打开教务系统课表页，并选择对应的“学年学期”
-<img width="831" height="266" alt="image" src="https://github.com/user-attachments/assets/a1a3819a-c893-43af-a566-d8810275c6ad" />
+<img width="1732" height="754" alt="image" src="https://github.com/user-attachments/assets/4c7b4787-f09a-4b8c-8c50-3de60d00cd42" />
 
 ### 第三步：点击对应的扩展程序
 <img width="377" height="138" alt="image" src="https://github.com/user-attachments/assets/7a6347a5-023a-46b6-a76c-7cd99a41b146" />
@@ -50,7 +50,7 @@
 ### 注意：第一步仅在首次使用或后续有版本更新时，才需要
 
 ### 第二步：登陆教务系统，打开教务系统课表页，并选择对应的“学年学期”
-<img width="802" height="273" alt="image" src="https://github.com/user-attachments/assets/d432c275-2faa-44e5-9200-b76239134978" />
+<img width="1732" height="754" alt="image" src="https://github.com/user-attachments/assets/4c7b4787-f09a-4b8c-8c50-3de60d00cd42" />
 
 ### 第三步：点击第一步中设置的书签，等待课表自动导出
 <img width="576" height="302" alt="image" src="https://github.com/user-attachments/assets/6c418583-2248-49dc-9e02-cca39ea6ae07" />
