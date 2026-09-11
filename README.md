@@ -19,8 +19,6 @@
 ### 第三步：点击对应的扩展程序
 <img width="538" height="323" alt="image" src="https://github.com/user-attachments/assets/79f7a12a-bef0-4aa2-988a-d66a11068d82" />
 
-<img width="377" height="138" alt="image" src="https://github.com/user-attachments/assets/7a6347a5-023a-46b6-a76c-7cd99a41b146" />
-
 ### 第四步：等待课表自动导出
 <img width="451" height="274" alt="UQR4_OF_$OOPN7Y{6NX}DJI" src="https://github.com/user-attachments/assets/8a00f6ff-4a96-4c24-8fca-db52b0230fc7" />
 <img width="523" height="75" alt="$_~QN8LYS $LONWHN$S7)@1" src="https://github.com/user-attachments/assets/8b9debcb-d4dd-4b02-9bdd-7664d2447bd8" />
