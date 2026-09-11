@@ -18,6 +18,7 @@
 
 ### 第三步：点击对应的扩展程序
 <img width="538" height="323" alt="image" src="https://github.com/user-attachments/assets/79f7a12a-bef0-4aa2-988a-d66a11068d82" />
+
 <img width="377" height="138" alt="image" src="https://github.com/user-attachments/assets/7a6347a5-023a-46b6-a76c-7cd99a41b146" />
 
 ### 第四步：等待课表自动导出
