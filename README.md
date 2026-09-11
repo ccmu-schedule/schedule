@@ -8,7 +8,7 @@
 0. [下载扩展包](https://github.com/ccmu-schedule/extension/releases/latest) `.zip` 文件
 1. 打开浏览器扩展程序界面（可以通过在地址栏输入`chrome://extensions/`，或`edge://extensions/，或`opera://extensions/`，也可以从“设置”中进入）
 2. 开启“开发者模式”
-3. 点击“加载未打包的扩展程序”或“加载解压缩的扩展”
+3. 点击“加载未打包的扩展程序”或“加载解压缩的扩展”或其他同义表述
 4. 选择**解压缩后的**对应文件
 
 
